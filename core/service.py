@@ -1,5 +1,5 @@
 from . import rozkladorg, import_service
-from .models import Group
+from .models import Group, Lesson
 
 
 def find_group(group_code: str) -> Group or None:
@@ -32,5 +32,6 @@ def find_group(group_code: str) -> Group or None:
                     return group
 
 
-def get_lessons(group: Group):
-    return []
+def get_schedule(group: Group):
+    lessons = Lesson.objects.of_group(group)
+    return lessons

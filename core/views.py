@@ -18,9 +18,9 @@ class GroupScheduleView(TemplateView):
 
     def get_context_data(self, group):
         if group is None:
-            return {'group': None, 'lessons': None}
+            return {'group': None, 'schedule': None}
         else:
             return {
                 'group': group,
-                'lessons': service.get_lessons(group)
+                'schedule': service.get_schedule(group)
             }
