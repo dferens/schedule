@@ -28,7 +28,10 @@ class TeacherAdmin(ModelAdmin):
 @register(models.Lesson)
 class LessonAdmin(ModelAdmin):
     list_filter = ('week', 'weekday', 'number', 'type', 'course__group')
-    list_display = ('course_group', 'course', 'type', 'teacher_link', 'week', 'weekday', 'number')
+    list_display = (
+        'course_group', 'course', 'type', 'teacher_link',
+        'week', 'weekday', 'number', 'place'
+    )
 
     def course_group(self, lesson):
         return lesson.course.group.code

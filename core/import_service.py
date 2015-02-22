@@ -73,6 +73,8 @@ def import_group(group_data: str):
             else:
                 teacher = None
 
+            assert lesson_data['lesson_room']
+
             Lesson.objects.get_or_create(
                 course=courses[lesson_data['lesson_full_name']],
                 week=lesson_data['lesson_week'],
@@ -80,6 +82,7 @@ def import_group(group_data: str):
                 number=lesson_data['lesson_number'],
                 defaults={
                     'teacher': teacher,
+                    'place': lesson_data['lesson_room'],
                     'type': LESSON_TYPES[lesson_data['lesson_type']],
                 },
             )

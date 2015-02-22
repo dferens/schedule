@@ -63,7 +63,7 @@ def get_group_lessons(group_code: str) -> dict:
             'lesson_number': int, in range [1..5]
             'lesson_type': str (Лек | Лаб | Прак)
             'lesson_week': int, (1 = first week, 2 = second week)
-            'lesson_room': str
+            'lesson_room': str ("517-18" etc.)
             'group_id': int
             'day_number': int, in range [1..7] (1 = Monday, 2 = Tuesday etc.)
             'teachers': [] or list of {

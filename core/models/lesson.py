@@ -37,13 +37,14 @@ class Lesson(models.Model):
         (TYPE_PRACTICE, 'практика'),
     )
     course = models.ForeignKey(Course, verbose_name='курс')
+    week = models.PositiveSmallIntegerField('тиждень', choices=WEEK_CHOICES)
+    weekday = models.PositiveSmallIntegerField('день', choices=WEEKDAY_CHOICES)
+    number = models.PositiveSmallIntegerField('пара', choices=NUMBER_CHOICES)
     type = models.CharField('тип заняття',
         max_length=16, choices=TYPE_CHOICES
     )
     teacher = models.ForeignKey(Teacher, verbose_name='викладач', null=True)
-    week = models.PositiveSmallIntegerField('тиждень', choices=WEEK_CHOICES)
-    weekday = models.PositiveSmallIntegerField('день', choices=WEEKDAY_CHOICES)
-    number = models.PositiveSmallIntegerField('пара', choices=NUMBER_CHOICES)
+    place = models.CharField('аудиторія', max_length=10)
 
     objects = LessonQuerySet.as_manager()
 
