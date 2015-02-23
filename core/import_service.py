@@ -57,15 +57,6 @@ def import_group(group_data: str):
             )
             teachers[teacher_id] = teacher
 
-        # Create courses if necessary, identify them by (group, name) pair
-        for course_full_name, data in unique_courses.items():
-            course, _ = Course.objects.get_or_create(
-                group=group,
-                full_name=course_full_name,
-                defaults={'short_name': data['lesson_name']}
-            )
-            courses[course.full_name] = course
-
         # Finally, create lessons records
         for lesson_data in lessons_data:
             if lesson_data['teachers']:
@@ -75,16 +66,28 @@ def import_group(group_data: str):
 
             assert lesson_data['lesson_room']
 
-            Lesson.objects.get_or_create(
-                course=courses[lesson_data['lesson_full_name']],
-                week=lesson_data['lesson_week'],
-                weekday=lesson_data['day_number'],
-                number=lesson_data['lesson_number'],
-                defaults={
-                    'teacher': teacher,
-                    'place': lesson_data['lesson_room'],
-                    'type': LESSON_TYPES[lesson_data['lesson_type']],
-                },
-            )
+            try:
+                lesson = Lesson.objects.get(
+                    week=lesson_data['lesson_week'],
+                    weekday=lesson_data['day_number'],
+                    number=lesson_data['lesson_number'],
+                    place=lesson_data['lesson_room'],
+                    course__full_name=lesson_data['lesson_full_name'],
+                )
+            except Lesson.DoesNotExist:
+                lesson = Lesson.objects.create(
+                    course=Course.objects.create(
+                        full_name=lesson_data['lesson_full_name'],
+                        short_name=lesson_data['lesson_name']
+                    ),
+                    week=lesson_data['lesson_week'],
+                    weekday=lesson_data['day_number'],
+                    number=lesson_data['lesson_number'],
+                    type=LESSON_TYPES[lesson_data['lesson_type']],
+                    teacher=teacher,
+                    place=lesson_data['lesson_room'],
+                )
+            finally:
+                lesson.groups.add(group)
 
     return group

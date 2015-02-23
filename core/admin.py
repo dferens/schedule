@@ -9,16 +9,6 @@ class GroupAdmin(ModelAdmin):
     list_display = ('code', 'okr', 'type')
 
 
-@register(models.Course)
-class CourseAdmin(ModelAdmin):
-    list_display = ('course_group', 'short_name', 'full_name')
-    search_fields = ('full_name',)
-
-    def course_group(self, course):
-        return course.group.code
-    course_group.short_description = models.Course._meta.get_field('group').verbose_name
-
-
 @register(models.Teacher)
 class TeacherAdmin(ModelAdmin):
     list_display = ('id', 'name', 'short_name', 'full_name')
@@ -27,15 +17,13 @@ class TeacherAdmin(ModelAdmin):
 
 @register(models.Lesson)
 class LessonAdmin(ModelAdmin):
-    list_filter = ('week', 'weekday', 'number', 'type', 'course__group')
+    readonly_fields = ('course',)
+    fields = ('course', 'week', 'weekday', 'number', 'place', 'type', 'groups')
+    list_filter = ('week', 'weekday', 'number', 'type')
     list_display = (
-        'course_group', 'course', 'type', 'teacher_link',
+        'course', 'type', 'teacher_link',
         'week', 'weekday', 'number', 'place'
     )
-
-    def course_group(self, lesson):
-        return lesson.course.group.code
-    course_group.short_description = models.Group._meta.verbose_name
 
     def teacher_link(self, lesson):
         url = reverse('admin:core_teacher_change', args=[lesson.teacher_id])

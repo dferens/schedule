@@ -2,13 +2,14 @@ from django.db import models
 from django.db.models.query import QuerySet
 
 from .course import Course
+from .group import Group
 from .teacher import Teacher
 
 
 class LessonQuerySet(QuerySet):
 
     def of_group(self, group):
-        return self.filter(course__group=group)
+        return self.filter(groups=group)
 
 
 class Lesson(models.Model):
@@ -37,6 +38,7 @@ class Lesson(models.Model):
         (TYPE_PRACTICE, 'практика'),
     )
     course = models.ForeignKey(Course, verbose_name='курс')
+    groups = models.ManyToManyField(Group, verbose_name='групи')
     week = models.PositiveSmallIntegerField('тиждень', choices=WEEK_CHOICES)
     weekday = models.PositiveSmallIntegerField('день', choices=WEEKDAY_CHOICES)
     number = models.PositiveSmallIntegerField('пара', choices=NUMBER_CHOICES)

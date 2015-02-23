@@ -13,9 +13,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Course',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
-                ('short_name', models.CharField(verbose_name='коротка назва', max_length=8)),
-                ('full_name', models.CharField(verbose_name='повна назва', max_length=128)),
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True, serialize=False)),
+                ('short_name', models.CharField(max_length=8, verbose_name='коротка назва')),
+                ('full_name', models.CharField(max_length=128, verbose_name='повна назва')),
             ],
             options={
                 'verbose_name': 'курс',
@@ -26,11 +26,11 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Group',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
-                ('prefix', models.CharField(verbose_name='префікс', max_length=4)),
-                ('code', models.CharField(unique=True, verbose_name='шифр', max_length=8)),
-                ('okr', models.CharField(choices=[('bachelor', 'бакалаврат'), ('magister', 'магістратура'), ('specialist', 'спеціалісти')], verbose_name='освітньо-кваліфікаційний рівень', max_length=16)),
-                ('type', models.CharField(choices=[('daily', 'денна'), ('extramural', 'заочна')], verbose_name='форма навчання', max_length=10)),
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True, serialize=False)),
+                ('prefix', models.CharField(max_length=4, verbose_name='префікс')),
+                ('code', models.CharField(max_length=8, verbose_name='шифр', unique=True)),
+                ('okr', models.CharField(max_length=16, verbose_name='освітньо-кваліфікаційний рівень', choices=[('bachelor', 'бакалаврат'), ('magister', 'магістратура'), ('specialist', 'спеціалісти')])),
+                ('type', models.CharField(max_length=10, verbose_name='форма навчання', choices=[('daily', 'денна'), ('extramural', 'заочна')])),
             ],
             options={
                 'verbose_name': 'група',
@@ -41,13 +41,14 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Lesson',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
-                ('type', models.CharField(choices=[('lecture', 'лекція'), ('lab', 'лаба'), ('practice', 'практика')], verbose_name='тип заняття', max_length=16)),
-                ('place', models.CharField(verbose_name='місце проведення', max_length=10)),
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True, serialize=False)),
                 ('week', models.PositiveSmallIntegerField(verbose_name='тиждень', choices=[(1, 'перший'), (2, 'другий')])),
                 ('weekday', models.PositiveSmallIntegerField(verbose_name='день', choices=[(1, 'пн'), (2, 'вт'), (3, 'ср'), (4, 'чт'), (5, 'пт'), (6, 'сб'), (7, 'нд')])),
                 ('number', models.PositiveSmallIntegerField(verbose_name='пара', choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5')])),
-                ('course', models.ForeignKey(to='core.Course', verbose_name='курс')),
+                ('type', models.CharField(max_length=16, verbose_name='тип заняття', choices=[('lecture', 'лекція'), ('lab', 'лаба'), ('practice', 'практика')])),
+                ('place', models.CharField(max_length=10, verbose_name='аудиторія')),
+                ('course', models.ForeignKey(verbose_name='курс', to='core.Course')),
+                ('groups', models.ManyToManyField(verbose_name='групи', to='core.Group')),
             ],
             options={
                 'verbose_name': 'заняття',
@@ -58,7 +59,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Teacher',
             fields=[
-                ('id', models.AutoField(primary_key=True, verbose_name='ID', serialize=False, auto_created=True)),
+                ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True, serialize=False)),
                 ('name', models.CharField(max_length=128)),
                 ('short_name', models.CharField(max_length=64)),
                 ('full_name', models.CharField(max_length=128)),
@@ -72,21 +73,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='lesson',
             name='teacher',
-            field=models.ForeignKey(null=True, verbose_name='викладач', to='core.Teacher'),
+            field=models.ForeignKey(verbose_name='викладач', to='core.Teacher', null=True),
             preserve_default=True,
         ),
         migrations.AlterUniqueTogether(
             name='lesson',
             unique_together=set([('course', 'week', 'weekday', 'number')]),
-        ),
-        migrations.AddField(
-            model_name='course',
-            name='group',
-            field=models.ForeignKey(to='core.Group', verbose_name='група'),
-            preserve_default=True,
-        ),
-        migrations.AlterUniqueTogether(
-            name='course',
-            unique_together=set([('group', 'full_name'), ('group', 'short_name')]),
         ),
     ]
