@@ -1,14 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>test</title>
-</head>
-<body>
-  {% if group %}
-    {{ group }}
-  {% else %}
-    Group does not exist
-  {% endif %}
-</body>
-</html>
+{% extends 'core/base.html' %}
+
+{% block title %}Group schedule{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12">
+      <h2>{{ group }}</h2>
+    </div>
+  </div>
+{% endblock %}

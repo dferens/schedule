@@ -1,6 +1,15 @@
+from .core import *
+
+#
+# django-grappelli
+#
+INSTALLED_APPS = ('grappelli',) + INSTALLED_APPS
+
 #
 # django-debug-toolbar settings
 #
+
+INSTALLED_APPS += ('debug_toolbar', 'template_timings_panel')
 
 DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.timer.TimerPanel',
@@ -15,3 +24,15 @@ DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.signals.SignalsPanel',
     'debug_toolbar.panels.redirects.RedirectsPanel',
 ]
+
+#
+# django-bower
+#
+
+INSTALLED_APPS += ('djangobower',)
+
+STATICFILES_FINDERS += ('djangobower.finders.BowerFinder',)
+
+BOWER_INSTALLED_APPS = (
+    'bootstrap#3.3.2',
+)
