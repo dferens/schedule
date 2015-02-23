@@ -1,3 +1,5 @@
+import os
+
 from .core import *
 
 #
@@ -36,3 +38,5 @@ STATICFILES_FINDERS += ('djangobower.finders.BowerFinder',)
 BOWER_INSTALLED_APPS = (
     'bootstrap#3.3.2',
 )
+
+BOWER_COMPONENTS_ROOT = VAR_DIR
