@@ -1,4 +1,11 @@
 from django.db import models
+from django.db.models.query import QuerySet
+
+from ..utils.db import QuerySetMixin
+
+
+class GroupQuerySet(QuerySetMixin, QuerySet):
+    pass
 
 
 class Group(models.Model):
@@ -28,6 +35,8 @@ class Group(models.Model):
     type = models.CharField('форма навчання',
         max_length=10, choices=TYPE_CHOICES
     )
+
+    objects = GroupQuerySet.as_manager()
 
     class Meta:
         verbose_name = 'група'

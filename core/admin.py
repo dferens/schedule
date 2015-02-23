@@ -1,7 +1,13 @@
+from django.contrib import admin
 from django.contrib.admin import register, ModelAdmin
 from django.core.urlresolvers import reverse
 
 from . import models
+
+
+class LessonInline(admin.TabularInline):
+    model = models.Lesson
+    max_num = 0
 
 
 @register(models.Group)
@@ -9,16 +15,21 @@ class GroupAdmin(ModelAdmin):
     list_display = ('code', 'okr', 'type')
 
 
+@register(models.Course)
+class CourseAdmin(ModelAdmin):
+    list_display = ('id', 'short_name', 'full_name')
+    inlines = [LessonInline]
+
+
 @register(models.Teacher)
 class TeacherAdmin(ModelAdmin):
     list_display = ('id', 'name', 'short_name', 'full_name')
     search_fields = ('name',)
+    inlines = [LessonInline]
 
 
 @register(models.Lesson)
 class LessonAdmin(ModelAdmin):
-    readonly_fields = ('course',)
-    fields = ('course', 'week', 'weekday', 'number', 'place', 'type', 'groups')
     list_filter = ('week', 'weekday', 'number', 'type')
     list_display = (
         'course', 'type', 'teacher_link',

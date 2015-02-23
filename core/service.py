@@ -22,13 +22,13 @@ def find_group(group_code: str) -> Group or None:
             new_group_code = group_data['group_full_name']
 
             if new_group_code == group_code:
-                group = import_service.import_group(group_data)
+                group = import_service.import_group_lessons(group_data)
                 return group
             else:
                 try:
                     return Group.objects.get(code__iexact=new_group_code)
                 except Group.DoesNotExist:
-                    group = import_service.import_group(group_data)
+                    group = import_service.import_group_lessons(group_data)
                     return group
 
 

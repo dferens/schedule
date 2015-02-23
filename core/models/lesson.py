@@ -38,15 +38,13 @@ class Lesson(models.Model):
         (TYPE_PRACTICE, 'практика'),
     )
     course = models.ForeignKey(Course, verbose_name='курс')
-    groups = models.ManyToManyField(Group, verbose_name='групи')
     week = models.PositiveSmallIntegerField('тиждень', choices=WEEK_CHOICES)
     weekday = models.PositiveSmallIntegerField('день', choices=WEEKDAY_CHOICES)
     number = models.PositiveSmallIntegerField('пара', choices=NUMBER_CHOICES)
-    type = models.CharField('тип заняття',
-        max_length=16, choices=TYPE_CHOICES
-    )
-    teacher = models.ForeignKey(Teacher, verbose_name='викладач', null=True)
     place = models.CharField('аудиторія', max_length=10)
+    type = models.CharField('тип заняття', max_length=16, choices=TYPE_CHOICES)
+    teacher = models.ForeignKey(Teacher, verbose_name='викладач', null=True)
+    groups = models.ManyToManyField(Group, verbose_name='групи')
 
     objects = LessonQuerySet.as_manager()
 
@@ -54,5 +52,5 @@ class Lesson(models.Model):
         verbose_name = 'заняття'
         verbose_name_plural = 'заняття'
         unique_together = (
-            ('course', 'week', 'weekday', 'number'),
+            ('course', 'week', 'weekday', 'number', 'place'),
         )
