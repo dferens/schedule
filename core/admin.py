@@ -13,19 +13,24 @@ class LessonInline(admin.TabularInline):
 @register(models.Group)
 class GroupAdmin(ModelAdmin):
     list_display = ('code', 'okr', 'type')
+    ordering = ['code']
+    radio_fields = {'type': admin.HORIZONTAL}
 
 
 @register(models.Course)
 class CourseAdmin(ModelAdmin):
-    list_display = ('id', 'short_name', 'full_name')
     inlines = [LessonInline]
+    list_display = ('short_name', 'full_name')
+    list_display_links = ['short_name']
+    ordering = ['short_name']
 
 
 @register(models.Teacher)
 class TeacherAdmin(ModelAdmin):
-    list_display = ('id', 'name', 'short_name', 'full_name')
-    search_fields = ('name',)
     inlines = [LessonInline]
+    list_display = ('id', 'name', 'short_name', 'full_name')
+    list_display_links = ('id', 'name')
+    search_fields = ('name',)
 
 
 @register(models.Lesson)
@@ -35,6 +40,7 @@ class LessonAdmin(ModelAdmin):
         'course', 'type', 'teacher_link',
         'week', 'weekday', 'number', 'place'
     )
+    radio_fields = {'week': admin.HORIZONTAL}
 
     def teacher_link(self, lesson):
         url = reverse('admin:core_teacher_change', args=[lesson.teacher_id])
