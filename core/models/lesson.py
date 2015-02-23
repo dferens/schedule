@@ -41,8 +41,8 @@ class Lesson(models.Model):
     week = models.PositiveSmallIntegerField('тиждень', choices=WEEK_CHOICES)
     weekday = models.PositiveSmallIntegerField('день', choices=WEEKDAY_CHOICES)
     number = models.PositiveSmallIntegerField('пара', choices=NUMBER_CHOICES)
-    place = models.CharField('аудиторія', max_length=10)
-    type = models.CharField('тип заняття', max_length=16, choices=TYPE_CHOICES)
+    place = models.CharField('аудиторія', max_length=10, null=True)
+    type = models.CharField('тип заняття', max_length=16, choices=TYPE_CHOICES, null=True)
     teacher = models.ForeignKey(Teacher, verbose_name='викладач', null=True)
     groups = models.ManyToManyField(Group, verbose_name='групи')
 

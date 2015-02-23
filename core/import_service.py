@@ -8,6 +8,7 @@ from .models import Group, Course, Teacher, Lesson
 
 
 LESSON_TYPES = {
+    None: None,
     rozkladorg.LESSON_TYPE_LECTURE: Lesson.TYPE_LECTURE,
     rozkladorg.LESSON_TYPE_LAB: Lesson.TYPE_LAB,
     rozkladorg.LESSON_TYPE_PRACTICE: Lesson.TYPE_PRACTICE
@@ -87,25 +88,22 @@ def import_group_lessons(group_data: str):
         new_lessons_data = []
 
         for lesson_data in lessons_data:
-            if lesson_data['teachers']:
-                teacher = teachers[lesson_data['teachers'][0]['teacher_id']]
+            # It makes no sense to guess lessons with undefined places & its courses
+            if lesson_data['lesson_room']:
+                try:
+                    lesson = Lesson.objects.get(
+                        week=lesson_data['lesson_week'],
+                        weekday=lesson_data['day_number'],
+                        number=lesson_data['lesson_number'],
+                        place=lesson_data['lesson_room'],
+                        course__full_name=lesson_data['lesson_full_name'],
+                    )
+                except Lesson.DoesNotExist:
+                    new_lessons_data.append(lesson_data)
+                else:
+                    lesson.groups.add(group)
             else:
-                teacher = None
-
-            assert lesson_data['lesson_room']
-
-            try:
-                lesson = Lesson.objects.get(
-                    week=lesson_data['lesson_week'],
-                    weekday=lesson_data['day_number'],
-                    number=lesson_data['lesson_number'],
-                    place=lesson_data['lesson_room'],
-                    course__full_name=lesson_data['lesson_full_name'],
-                )
-            except Lesson.DoesNotExist:
                 new_lessons_data.append(lesson_data)
-            else:
-                lesson.groups.add(group)
 
         # Step 3: create new lessons, try to reuse existing courses
         for lesson_data in new_lessons_data:
