@@ -44,3 +44,7 @@ class Group(models.Model):
 
     def __str__(self):
         return self.code
+
+    @staticmethod
+    def autocomplete_search_fields():
+        return ['code__icontains']

@@ -6,8 +6,16 @@ from . import models
 
 
 class LessonInline(admin.TabularInline):
+    raw_id_fields = ['groups']
+    autocomplete_lookup_fields = {
+        'm2m': ['groups']
+    }
     model = models.Lesson
     max_num = 0
+    fields = [
+        'course', 'week', 'weekday', 'number', 'place',
+        'type', 'groups'
+    ]
 
 
 @register(models.Group)
@@ -35,6 +43,11 @@ class TeacherAdmin(ModelAdmin):
 
 @register(models.Lesson)
 class LessonAdmin(ModelAdmin):
+    raw_id_fields = ['teacher', 'groups']
+    autocomplete_lookup_fields = {
+        'fk': ['teacher'],
+        'm2m': ['groups']
+    }
     list_filter = ('week', 'weekday', 'number', 'type')
     list_display = (
         'course', 'type', 'teacher_link',

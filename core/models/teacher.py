@@ -21,3 +21,7 @@ class Teacher(models.Model):
 
     def __str__(self):
         return self.full_name
+
+    @staticmethod
+    def autocomplete_search_fields():
+        return ['full_name__icontains']
