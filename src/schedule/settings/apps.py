@@ -40,7 +40,39 @@ BOWER_INSTALLED_APPS = (
     'jquery#2.3.1',
     'react#0.12.2',
     'react-router#0.12.2',
-    'sugarjs#1.4.1'
 )
 
 BOWER_COMPONENTS_ROOT = VAR_DIR
+
+#
+# django-pipeline
+#
+
+INSTALLED_APPS += ('pipeline',)
+
+STATICFILES_STORAGE = 'pipeline.storage.PipelineStorage'
+
+STATICFILES_FINDERS += ('pipeline.finders.PipelineFinder',)
+
+PIPELINE_COMPILERS = (
+    'pipeline.compilers.es6.ES6Compiler',
+)
+
+PIPELINE_6TO5_BINARY = 'babel --experimental'
+
+PIPELINE_JS = {
+    'react': {
+        'source_filenames': (
+            'react/react.js',
+            'react-router/build/global/ReactRouter.js',
+        ),
+        'output_filename': 'js/react-bundle.js'
+    },
+    'schedule': {
+        'source_filenames': (
+            'jquery/dist/jquery.js',
+            'core/js/schedule/*.es6',
+        ),
+        'output_filename': 'js/schedule.js'
+    }
+}
