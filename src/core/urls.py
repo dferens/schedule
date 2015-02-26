@@ -3,5 +3,6 @@ from django.conf.urls import patterns, include, url
 from . import views
 
 urlpatterns = [
-    url(r'^(?P<code>[\w-]+)/$', views.GroupScheduleView.as_view(), name='group'),
+    url(r'^lessons/$', views.LessonsView.as_view(), name='lessons'),
+    url(r'^', views.ScheduleAppView.as_view(), name='main'),
 ]

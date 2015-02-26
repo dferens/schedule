@@ -37,6 +37,10 @@ STATICFILES_FINDERS += ('djangobower.finders.BowerFinder',)
 
 BOWER_INSTALLED_APPS = (
     'bootstrap#3.3.2',
+    'jquery#2.3.1',
+    'react#0.12.2',
+    'react-router#0.12.2',
+    'sugarjs#1.4.1'
 )
 
 BOWER_COMPONENTS_ROOT = VAR_DIR

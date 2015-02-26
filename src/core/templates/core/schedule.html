@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+
+{% load static %}
+
+{% block scripts %}
+  <script src="{% static 'sugarjs/release/sugar.min.js' %}"></script>
+  <script src="{% static 'jquery/dist/jquery.js' %}"></script>
+  <script src="{% static 'react/react.js' %}"></script>
+  <script src="{% static 'react-router/build/global/ReactRouter.js' %}"></script>
+  <script src="{% static 'react/JSXTransformer.js' %}"></script>
+  <script>
+    var schedule = window.schedule || {};
+    schedule.API_URL = "{% url 'schedule:lessons' %}";
+  </script>
+  <script type="text/jsx" src="{% static 'core/js/schedule/app.jsx' %}"></script>
+{% endblock %}
+
+{% block title %}Schedule{% endblock %}
+
+{% block content %}
+  <div class="row">
+    <div class="col-md-12">
+      <div id="schedule-app"></div>
+    </div>
+  </div>
+{% endblock %}

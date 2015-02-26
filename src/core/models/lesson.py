@@ -11,6 +11,12 @@ class LessonQuerySet(QuerySet):
     def of_group(self, group):
         return self.filter(groups=group)
 
+    def of_teacher(self, teacher):
+        return self.filter(teacher=teacher)
+
+    def of_course(self, course):
+        return self.filter(course=course)
+
 
 class Lesson(models.Model):
     WEEK_CHOICES = (
