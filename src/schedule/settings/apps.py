@@ -40,6 +40,7 @@ BOWER_INSTALLED_APPS = (
     'jquery#2.3.1',
     'react#0.12.2',
     'react-router#0.12.2',
+    'lodash#3.3.1'
 )
 
 BOWER_COMPONENTS_ROOT = VAR_DIR

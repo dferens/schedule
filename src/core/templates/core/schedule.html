@@ -7,9 +7,13 @@
   {% javascript 'react' %}
   {% javascript 'schedule' %}
   <script>
-    schedule.API_URL = "{% url 'schedule:lessons' %}";
-    schedule.run(document.getElementById('schedule-app'));
+    Schedule.settings.lessonsUrl = "{% url 'schedule:lessons' %}";
+    Schedule.ui.run(document.getElementById('schedule-app'));
   </script>
+{% endblock %}
+
+{% block styles %}
+  {% stylesheet 'schedule' %}
 {% endblock %}
 
 {% block title %}Schedule{% endblock %}

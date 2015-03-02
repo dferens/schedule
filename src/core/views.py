@@ -27,6 +27,11 @@ class LessonsView(View):
 
         return JsonResponse({
             'lessons': [{
+                'course': {
+                    'id': lesson.course.id,
+                    'short_name': lesson.course.short_name,
+                    'full_name': lesson.course.full_name
+                },
                 'week': lesson.week,
                 'weekday': lesson.weekday,
                 'number': lesson.number,
