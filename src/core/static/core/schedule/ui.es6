@@ -7,6 +7,12 @@ schedule.ui = (function() {
 
   let {core} = schedule
 
+  function setDefaults(object, keys, value=null) {
+    keys.filter(k => !has(object, k))
+        .forEach(k => {object[k] = value})
+    return object
+  }
+
   let CourseButton = React.createClass({
     render() {
       let {id, short_name} = this.props.course
@@ -89,9 +95,7 @@ schedule.ui = (function() {
      */
     render() {
       let lessonPerNum = indexBy(this.props.lessons, "number")
-      range(1, 6).filter(num => !has(lessonPerNum, num))
-                 .forEach(num => {lessonPerNum[num] = null})
-
+      setDefaults(lessonPerNum, core.getLessonNumbersRange())
       return (
         <div className="lessons-list">
           <div className="lesson-item header">
@@ -113,8 +117,13 @@ schedule.ui = (function() {
       let schedule = this.props.schedule
       let lessonsPerWeek = mapValues(
         groupBy(schedule.lessons, 'week'),
-        lessons => groupBy(lessons, 'weekday')
+        lessons => {
+          let result = groupBy(lessons, 'weekday')
+          setDefaults(result, core.getWeekdaysRange())
+          return result
+        }
       )
+
       return (
         <div>
           {map(lessonsPerWeek, (lessonsPerDay, week) =>

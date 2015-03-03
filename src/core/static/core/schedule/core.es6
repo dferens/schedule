@@ -31,6 +31,14 @@ schedule.core = {
         })
     },
 
+    getWeekdaysRange() {
+        return _.range(1, 7)
+    },
+
+    getLessonNumbersRange() {
+        return _.range(1, 6)
+    },
+
     getWeekdayName(weekday) {
         let weekday = typeof weekday == 'string' ? parseInt(weekday) : weekday
         switch (weekday) {
