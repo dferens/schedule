@@ -1,19 +1,34 @@
-var Schedule = window.Schedule || {}
+var schedule = window.schedule || {}
 
-Schedule.core = {
-    getGroupLessons(groupCode, callback) {
-        $.get(Schedule.settings.lessonsUrl, {group: groupCode})
-         .success(result => callback(result.lessons))
+schedule.core = {
+    getGroupSchedule(groupCode, callback) {
+        let url = schedule.settings.group_lessons_url
+        $.get(url, {code: groupCode}, result => {
+            callback({
+                group: result.group,
+                schedule: result.schedule
+            })
+        })
     },
 
-    getTeacherLessons(teacherId, callback) {
-        $.get(Schedule.settings.lessonsUrl, {teacher: teacherId})
-         .success(result => callback(result.lessons))
+    getTeacherSchedule(teacherId, callback) {
+        let url = schedule.settings.teacher_lessons_url
+        $.get(url, {teacher: teacherId}, result => {
+            callback({
+                teacher: result.teacher,
+                schedule: result.schedule
+            })
+        })
     },
 
-    getCourseLessons(courseId, callback) {
-        $.get(Schedule.settings.lessonsUrl, {course: courseId})
-         .success(result => callback(result.lessons))
+    getCourseSchedule(courseId, callback) {
+        let url = schedule.settings.course_lessons_url
+        $.get(url, {course: courseId}, result => {
+            callback({
+                course: result.course,
+                schedule: result.schedule
+            })
+        })
     },
 
     getWeekdayName(weekday) {

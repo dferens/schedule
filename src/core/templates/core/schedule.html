@@ -7,8 +7,11 @@
   {% javascript 'react' %}
   {% javascript 'schedule' %}
   <script>
-    Schedule.settings.lessonsUrl = "{% url 'schedule:lessons' %}";
-    Schedule.ui.run(document.getElementById('schedule-app'));
+    schedule.settings.group_lessons_url = "{% url 'schedule:group-lessons' %}";
+    schedule.settings.course_lessons_url = "{% url 'schedule:course-lessons' %}";
+    schedule.settings.teacher_lessons_url = "{% url 'schedule:teacher-lessons' %}";
+
+    schedule.ui.run(document.getElementById('schedule-app'));
   </script>
 {% endblock %}
 

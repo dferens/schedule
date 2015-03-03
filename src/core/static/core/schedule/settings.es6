@@ -1,5 +1,7 @@
-var Schedule = window.Schedule || {}
+var schedule = window.schedule || {}
 
-Schedule.settings = {
-    lessonsUrl: null
+schedule.settings = {
+    group_lessons_url: null,
+    course_lessons_url: null,
+    teacher_lessons_url: null,
 }

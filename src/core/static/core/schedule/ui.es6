@@ -1,11 +1,11 @@
-var Schedule = window.Schedule || {}
+var schedule = window.schedule || {}
 
-Schedule.ui = (function() {
+schedule.ui = (function() {
   let Router = ReactRouter
   let {DefaultRoute, Link, Route, RouteHandler} = Router
-  let {clone, indexBy, groupBy, has, map, mapValues, reduce, range} = _
+  let {indexBy, groupBy, sortBy, has, map, mapValues, reduce, range} = _
 
-  let {core} = Schedule
+  let {core} = schedule
 
   let CourseButton = React.createClass({
     render() {
@@ -33,12 +33,13 @@ Schedule.ui = (function() {
     /*
      * Displays link to group schedule
      *
-     * @prop {String} code - group's code
+     * @prop {GroupBlock} group - group's code
      */
     render() {
+      let {group} = this.props
       return (
-        <Link className="group-link" to="group-schedule" params={{code: this.props.code}}>
-          {this.props.code.toUpperCase()}
+        <Link className="group-link" to="group-schedule" params={{code: group.code}}>
+          {group.code.toUpperCase()}
         </Link>
       )
     }
@@ -48,18 +49,18 @@ Schedule.ui = (function() {
     /*
      * Displays single lesson object
      *
-     * @prop Object lesson
+     * @prop {LessonBlock} lesson
      */
     render() {
       let {lesson} = this.props
 
       if (lesson) {
-        let sortedGroups = clone(this.props.lesson.groups).sort()
-        let groupButtons = reduce(sortedGroups, (result, groupCode) => {
+        let sortedGroups = sortBy(this.props.lesson.groups, 'code')
+        let groupButtons = reduce(sortedGroups, (result, group) => {
           if (result.length > 0)
             result.push(", ")
 
-          result.push(<GroupButton code={groupCode}/>)
+          result.push(<GroupButton group={group}/>)
           return result
         }, [])
 
@@ -84,7 +85,7 @@ Schedule.ui = (function() {
     /*
      * Displays collection of lessons for 1 day
      *
-     * @prop {Array[Object]} lessons
+     * @prop {Array[LessonBlock]} lessons
      */
     render() {
       let lessonPerNum = indexBy(this.props.lessons, "number")
@@ -94,7 +95,7 @@ Schedule.ui = (function() {
       return (
         <div className="lessons-list">
           <div className="lesson-item header">
-            <p>{Schedule.core.getWeekdayName(this.props.weekday)}</p>
+            <p>{core.getWeekdayName(this.props.weekday)}</p>
           </div>
           {map(lessonPerNum, lesson => <LessonItem lesson={lesson}/>)}
         </div>
@@ -102,15 +103,16 @@ Schedule.ui = (function() {
     }
   })
 
-  let LessonsTable = React.createClass({
+  let Schedule = React.createClass({
     /*
      * Displays schedule grid for 2 weeks
      *
-     * @prop {Array[Object]} lessons
+     * @prop {ScheduleBlock} schedule
      */
     render() {
+      let schedule = this.props.schedule
       let lessonsPerWeek = mapValues(
-        groupBy(this.props.lessons, 'week'),
+        groupBy(schedule.lessons, 'week'),
         lessons => groupBy(lessons, 'weekday')
       )
       return (
@@ -125,69 +127,78 @@ Schedule.ui = (function() {
     }
   })
 
-  let GroupSchedule = React.createClass({
-    getInitialState() {return {lessons: []}},
-    componentWillMount() {this.loadLessons()},
-    componentWillReceiveProps() {this.loadLessons()},
+  let GroupScheduleHandler = React.createClass({
+    componentWillMount() {this.loadSchedule()},
+    componentWillReceiveProps() {this.loadSchedule()},
 
-    loadLessons() {
-      core.getGroupLessons(
+    loadSchedule() {
+      core.getGroupSchedule(
         this.props.params.code,
-        lessons => this.setState({lessons: lessons})
+        ({group, schedule}) => this.setState({group: group, schedule: schedule})
       )
     },
 
     render() {
-      return (
-        <div>
-          <p>Schedule for group {this.props.params.code}</p>
-          <LessonsTable lessons={this.state.lessons} />
-        </div>
-      )
+      if (this.state) {
+        return (
+          <div>
+            <p>Schedule for group: {this.props.params.code}</p>
+            <Schedule schedule={this.state.schedule} />
+          </div>
+        )
+      } else {
+        return null
+      }
     }
   })
 
-  let TeacherSchedule = React.createClass({
-    getInitialState() {return {lessons: []}},
-    componentWillMount() {this.loadLessons()},
-    componentWillReceiveProps() {this.loadLessons()},
+  let TeacherScheduleHandler = React.createClass({
+    componentWillMount() {this.loadSchedule()},
+    componentWillReceiveProps() {this.loadSchedule()},
 
-    loadLessons() {
-      core.getTeacherLessons(
+    loadSchedule() {
+      core.getTeacherSchedule(
         this.props.params.teacherId,
-        lessons => this.setState({lessons: lessons})
+        ({teacher, schedule}) => this.setState({teacher: teacher, schedule: schedule})
       )
     },
 
     render() {
-      return (
-        <div>
-          <p>Schedule for teacher</p>
-          <LessonsTable lessons={this.state.lessons} />
-        </div>
-      )
+      if (this.state) {
+        return (
+          <div>
+            <p>Schedule for teacher: {this.state.teacher.full_name}</p>
+            <Schedule schedule={this.state.schedule} />
+          </div>
+        )
+      } else {
+        return null
+      }
     }
   })
 
-  let CourseSchedule = React.createClass({
-    getInitialState() {return {lessons: []}},
-    componentWillMount() {this.loadLessons()},
-    componentWillReceiveProps() {this.loadLessons()},
+  let CourseScheduleHandler = React.createClass({
+    componentWillMount() {this.loadSchedule()},
+    componentWillReceiveProps() {this.loadSchedule()},
 
-    loadLessons() {
-      core.getCourseLessons(
+    loadSchedule() {
+      core.getCourseSchedule(
         this.props.params.courseId,
-        lessons => this.setState({lessons: lessons})
+        ({schedule, course}) => this.setState({schedule: schedule, course: course})
       )
     },
 
     render() {
-      return (
-        <div>
-          <p>Schedule for course</p>
-          <LessonsTable lessons={this.state.lessons} />
-        </div>
-      )
+      if (this.state) {
+        return (
+          <div>
+            <p>Schedule for course: {this.state.course.full_name}</p>
+            <Schedule schedule={this.state.schedule} />
+          </div>
+        )
+      } else {
+        return null
+      }
     }
   })
 
@@ -201,9 +212,9 @@ Schedule.ui = (function() {
 
       let routes = (
         <Route name="app" path="/schedule/" handler={App}>
-          <Route name="group-schedule" path="group/:code/" handler={GroupSchedule} />
-          <Route name="teacher-schedule" path="teacher/:teacherId/" handler={TeacherSchedule} />
-          <Route name="course-schedule" path="course/:courseId/" handler={CourseSchedule} />
+          <Route name="group-schedule" path="group/:code/" handler={GroupScheduleHandler} />
+          <Route name="teacher-schedule" path="teacher/:teacherId/" handler={TeacherScheduleHandler} />
+          <Route name="course-schedule" path="course/:courseId/" handler={CourseScheduleHandler} />
         </Route>
       )
       Router.run(routes, Router.HistoryLocation, (Handler, state) => {
