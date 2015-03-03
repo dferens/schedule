@@ -6,6 +6,16 @@ Schedule.core = {
          .success(result => callback(result.lessons))
     },
 
+    getTeacherLessons(teacherId, callback) {
+        $.get(Schedule.settings.lessonsUrl, {teacher: teacherId})
+         .success(result => callback(result.lessons))
+    },
+
+    getCourseLessons(courseId, callback) {
+        $.get(Schedule.settings.lessonsUrl, {course: courseId})
+         .success(result => callback(result.lessons))
+    },
+
     getWeekdayName(weekday) {
         let weekday = typeof weekday == 'string' ? parseInt(weekday) : weekday
         switch (weekday) {

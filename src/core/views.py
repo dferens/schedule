@@ -4,7 +4,7 @@ from django.views.generic import View, TemplateView
 from django.shortcuts import redirect, get_object_or_404
 
 from . import service
-from .models import Group, Teacher
+from .models import Group, Teacher, Course
 
 
 class ScheduleAppView(TemplateView):
@@ -22,6 +22,9 @@ class LessonsView(View):
         elif 'teacher' in params and params['teacher'].isdigit():
             teacher = get_object_or_404(Teacher, id=params['teacher'])
             lessons = service.get_teacher_lessons(teacher)
+        elif 'course' in params and params['course'].isdigit():
+            course = get_object_or_404(Course, id=params['course'])
+            lessons = service.get_course_lessons(course)
         else:
             return HttpResponseBadRequest()
 

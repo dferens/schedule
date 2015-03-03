@@ -9,7 +9,7 @@
 }
 
 .lessons-list .lesson-item {
-    padding: 5px 10px;
+    padding: 5px;
     margin-bottom: -1px;
     background-color: #fff;
     border: 1px solid #ddd;
@@ -30,16 +30,6 @@
     border-bottom-right-radius: 4px;
 }
 
-.lessons-list .lesson-item .title {
-    height: 32px;
-    overflow: hidden;
-    margin-top: 0;
-    margin-bottom: 5px;
-}
-
-.lessons-list .lesson-item .teacher {
-}
-
 .lessons-list .lesson-item.header {
     height: initial;
     background-color: rgb(238, 238, 238);
@@ -47,4 +37,24 @@
 
 .lessons-list .lesson-item.empty {
     background-color: rgb(238, 238, 238);
+}
+
+.lesson-item .title {
+    height: 32px;
+    overflow: hidden;
+    margin-top: 0;
+    margin-bottom: 5px;
+}
+
+.lesson-item .group-link {
+    display: inline-block;
+}
+.lesson-item .teacher-link {
+    display: inline-block;
+}
+.lesson-item .course-link {
+    display: inline-block;
+    font-weight: bold;
+    width: 100%;
+    text-align: center;
 }

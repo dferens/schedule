@@ -72,8 +72,17 @@ PIPELINE_JS = {
     'schedule': {
         'source_filenames': (
             'jquery/dist/jquery.js',
+            'lodash/lodash.js',
             'core/js/schedule/*.es6',
         ),
         'output_filename': 'js/schedule.js'
+    }
+}
+
+PIPELINE_CSS = {
+    'schedule': {
+        'source_filenames': (
+            'core/css/schedule/app.css',
+        )
     }
 }
