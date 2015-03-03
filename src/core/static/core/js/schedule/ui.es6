@@ -63,10 +63,14 @@ Schedule.ui = (function() {
           return result
         }, [])
 
+        let teacherButton = null
+        if (lesson.teacher)
+          teacherButton = <TeacherButton teacher={lesson.teacher} />
+
         return (
           <div className="lesson-item">
             <CourseButton course={lesson.course} />
-            <TeacherButton teacher={lesson.teacher} />
+            {teacherButton}
             <p className="groups">{groupButtons}</p>
           </div>
         )
