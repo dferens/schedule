@@ -1,35 +1,36 @@
 from . import rozkladorg, import_service
-from .models import Course, Group, Lesson, Teacher
+from .models import Course, Group, GroupIndex, Lesson, Teacher
 
 
-def find_group(group_code: str) -> Group or None:
+def find_group(group_alias: str) -> Group or None:
     """
-    Look up group by it's code.
+    Look up group by some group identifier.
 
     If group does not exist in db, prefetch it's info from rozklad.org and
     create record.
     """
-    group_code = group_code.strip()
+    group = GroupIndex.objects.lookup_group(group_alias)
 
-    try:
-        return Group.objects.get(code__iexact=group_code)
-    except Group.DoesNotExist:
-        group_data = rozkladorg.get_group(group_code)
+    if group is not None:
+        return group
+    else:
+        group_data = rozkladorg.get_group(group_alias)
 
         if group_data is None:
             return None
         else:
-            new_group_code = group_data['group_full_name']
+            group_code = group_data['group_full_name']
 
-            if new_group_code == group_code:
+            try:
+                group = Group.objects.get(code=group_code)
+            except Group.DoesNotExist:
                 group = import_service.import_group_lessons(group_data)
-                return group
-            else:
-                try:
-                    return Group.objects.get(code__iexact=new_group_code)
-                except Group.DoesNotExist:
-                    group = import_service.import_group_lessons(group_data)
-                    return group
+
+                if group.code != group_alias:
+                    GroupIndex.objects.add_alias(group, group.code)
+
+            GroupIndex.objects.add_alias(group, group_alias)
+            return group
 
 
 def get_group_lessons(group: Group) -> [Lesson]:

@@ -48,3 +48,31 @@ class Group(models.Model):
     @staticmethod
     def autocomplete_search_fields():
         return ['code__icontains']
+
+
+class GroupIndexManager(models.Manager):
+
+    def lookup_group(self, group_alias):
+        try:
+            return (
+                self.select_related('group')
+                    .get(alias__iexact=group_alias)
+                    .group
+            )
+        except self.model.DoesNotExist:
+            return None
+
+    def add_alias(self, group, alias):
+        self.get_or_create(group=group, alias=alias)
+
+
+class GroupIndex(models.Model):
+    alias = models.CharField(max_length=8)
+    group = models.ForeignKey(Group)
+
+    objects = GroupIndexManager()
+
+    class Meta:
+        unique_together = (
+            ('alias', 'group'),
+        )

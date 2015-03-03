@@ -16,8 +16,8 @@ class LessonsView(View):
     def get(self, request):
         params = request.GET
 
-        if 'group' in params and len(params['group']) > 2:
-            group = service.find_group(params['group'])
+        if 'group' in params and len(params['group'].strip()) > 2:
+            group = service.find_group(params['group'].strip())
             lessons = service.get_group_lessons(group)
         elif 'teacher' in params and params['teacher'].isdigit():
             teacher = get_object_or_404(Teacher, id=params['teacher'])
