@@ -126,15 +126,13 @@ Schedule.ui = (function() {
   })
 
   let GroupSchedule = React.createClass({
-    mixins: [Router.State],
-
     getInitialState() {return {lessons: []}},
     componentWillMount() {this.loadLessons()},
     componentWillReceiveProps() {this.loadLessons()},
 
     loadLessons() {
       core.getGroupLessons(
-        this.getParams().code,
+        this.props.params.code,
         lessons => this.setState({lessons: lessons})
       )
     },
@@ -142,7 +140,7 @@ Schedule.ui = (function() {
     render() {
       return (
         <div>
-          <p>Schedule for group {this.getParams().code}</p>
+          <p>Schedule for group {this.props.params.code}</p>
           <LessonsTable lessons={this.state.lessons} />
         </div>
       )
@@ -150,15 +148,13 @@ Schedule.ui = (function() {
   })
 
   let TeacherSchedule = React.createClass({
-    mixins: [Router.State],
-
     getInitialState() {return {lessons: []}},
     componentWillMount() {this.loadLessons()},
     componentWillReceiveProps() {this.loadLessons()},
 
     loadLessons() {
       core.getTeacherLessons(
-        this.getParams().teacherId,
+        this.props.params.teacherId,
         lessons => this.setState({lessons: lessons})
       )
     },
@@ -174,15 +170,13 @@ Schedule.ui = (function() {
   })
 
   let CourseSchedule = React.createClass({
-    mixins: [Router.State],
-
     getInitialState() {return {lessons: []}},
     componentWillMount() {this.loadLessons()},
     componentWillReceiveProps() {this.loadLessons()},
 
     loadLessons() {
       core.getCourseLessons(
-        this.getParams().courseId,
+        this.props.params.courseId,
         lessons => this.setState({lessons: lessons})
       )
     },
@@ -201,7 +195,7 @@ Schedule.ui = (function() {
     run(element) {
       let App = React.createClass({
         render() {
-          return <div><RouteHandler/></div>
+          return <div><RouteHandler params={this.props.params}/></div>
         }
       })
 
@@ -212,7 +206,10 @@ Schedule.ui = (function() {
           <Route name="course-schedule" path="course/:courseId/" handler={CourseSchedule} />
         </Route>
       )
-      Router.run(routes, Router.HistoryLocation, H => React.render(<H/>, element))
+      Router.run(routes, Router.HistoryLocation, (Handler, state) => {
+          React.render(<Handler params={state.params}/>, element)
+        }
+      )
     }
   }
 })()
