@@ -37,10 +37,10 @@ STATICFILES_FINDERS += ('djangobower.finders.BowerFinder',)
 
 BOWER_INSTALLED_APPS = (
     'bootstrap#3.3.2',
-    'jquery#2.3.1',
+    'jquery#>1.9.1',
     'react#0.12.2',
     'react-router#0.12.2',
-    'lodash#3.3.1'
+    'lodash#3.3.1',
 )
 
 BOWER_COMPONENTS_ROOT = VAR_DIR
@@ -57,6 +57,7 @@ STATICFILES_FINDERS += ('pipeline.finders.PipelineFinder',)
 
 PIPELINE_COMPILERS = (
     'pipeline.compilers.es6.ES6Compiler',
+    'pipeline.compilers.sass.SASSCompiler'
 )
 
 PIPELINE_6TO5_BINARY = 'babel --experimental'
@@ -73,7 +74,7 @@ PIPELINE_JS = {
         'source_filenames': (
             'jquery/dist/jquery.js',
             'lodash/lodash.js',
-            'core/js/schedule/*.es6',
+            'core/schedule/*.es6',
         ),
         'output_filename': 'js/schedule.js'
     }
@@ -82,7 +83,7 @@ PIPELINE_JS = {
 PIPELINE_CSS = {
     'schedule': {
         'source_filenames': (
-            'core/css/schedule/app.css',
+            'core/schedule/*.sass',
         )
     }
 }

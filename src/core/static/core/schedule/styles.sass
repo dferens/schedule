@@ -1,0 +1,48 @@
+.lessons-list
+  width: 20%
+  float: left
+  margin: 1px
+
+  .lesson-item
+    padding: 5px
+    margin-bottom: -1px
+    background-color: #fff
+    border: 1px solid #ddd
+    width: 12em
+    height: 6em
+
+    &:first-child
+      border-top-left-radius: 4px
+      border-top-right-radius: 4px
+
+    &:last-child
+      border-bottom-left-radius: 4px
+      border-bottom-right-radius: 4px
+
+    &.header
+      height: initial
+      background-color: rgb(238, 238, 238)
+
+    &.empty
+      background-color: rgb(238, 238, 238)
+
+    p
+      margin: 0
+
+    .title
+      height: 32px
+      overflow: hidden
+      margin-top: 0
+      margin-bottom: 5px
+
+    .group-link
+      display: inline-block
+
+    .teacher-link
+      display: inline-block
+
+    .course-link
+      display: inline-block
+      font-weight: bold
+      width: 100%
+      text-align: center

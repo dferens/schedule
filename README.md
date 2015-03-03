@@ -6,6 +6,7 @@ Alternative to [rozklad.kpi.ua](http://rozklad.kpi.ua/)
 
 * Python 3.x
 * bower
+* [Sass compiler](http://sass-lang.com/install)
 * [babel](https://babeljs.io/)
 
 
