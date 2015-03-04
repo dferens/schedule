@@ -41,6 +41,7 @@ BOWER_INSTALLED_APPS = (
     'react#0.12.2',
     'react-router#0.12.2',
     'lodash#3.3.1',
+    'moment#2.9.0'
 )
 
 BOWER_COMPONENTS_ROOT = VAR_DIR
@@ -74,6 +75,8 @@ PIPELINE_JS = {
         'source_filenames': (
             'jquery/dist/jquery.js',
             'lodash/lodash.js',
+            'moment/moment.js',
+            'moment/locale/uk.js',
             'core/schedule/*.es6',
         ),
         'output_filename': 'js/schedule.js'

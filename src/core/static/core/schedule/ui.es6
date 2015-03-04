@@ -91,17 +91,53 @@ schedule.ui = (function() {
     /*
      * Displays collection of lessons for 1 day
      *
+     * @prop {moment} lessonsDate
+     * @prop {Array[LessonBlock]} lessons
+     */
+    headerMomentFormat: 'dddd, D MMMM',
+
+    render() {
+      let {lessons, lessonsDate} = this.props
+      let isToday = moment().startOf('day').isSame(lessonsDate.startOf('day'))
+      let lessonPerNum = indexBy(lessons, "number")
+      setDefaults(lessonPerNum, core.getLessonNumbersRange())
+
+      return (
+        <div className={'lessons-list ' + (isToday ? 'today' : '')}>
+          <div className="lesson-item header">
+            <p>{lessonsDate.format(this.headerMomentFormat)}</p>
+          </div>
+          {map(lessonPerNum, lesson => <LessonItem lesson={lesson}/>)}
+        </div>
+      )
+    }
+  })
+
+  let LessonsWeekList = React.createClass({
+    /*
+     * Displays schedule for 1 week
+     *
+     * @prop {Integer} week
+     * @prop {moment} weekStartDate
      * @prop {Array[LessonBlock]} lessons
      */
     render() {
-      let lessonPerNum = indexBy(this.props.lessons, "number")
-      setDefaults(lessonPerNum, core.getLessonNumbersRange())
+      let {week, weekStartDate, lessons} = this.props
+      let className = (week == 1) ? 'primary' : 'secondary'
+      let lessonsPerDay = groupBy(lessons, 'weekday')
+      setDefaults(lessonsPerDay, core.getWeekdaysRange())
+
       return (
-        <div className="lessons-list">
-          <div className="lesson-item header">
-            <p>{core.getWeekdayName(this.props.weekday)}</p>
-          </div>
-          {map(lessonPerNum, lesson => <LessonItem lesson={lesson}/>)}
+        <div className={'row ' + className}>
+          {map(lessonsPerDay, (lessons, weekday) => {
+            let date = moment(weekStartDate).add(weekday - 1, 'days')
+            return (
+              <LessonsList
+                weekday={weekday}
+                lessonsDate={date}
+                lessons={lessons} />
+            )}
+          )}
         </div>
       )
     }
@@ -114,23 +150,24 @@ schedule.ui = (function() {
      * @prop {ScheduleBlock} schedule
      */
     render() {
+      let now = moment()
       let schedule = this.props.schedule
-      let lessonsPerWeek = mapValues(
-        groupBy(schedule.lessons, 'week'),
-        lessons => {
-          let result = groupBy(lessons, 'weekday')
-          setDefaults(result, core.getWeekdaysRange())
-          return result
-        }
-      )
+      let lessonsPerWeek = groupBy(schedule.lessons, 'week')
+      let currentWeekStartDate = now.subtract(now.day() - 1, 'days')
+      let nextWeekStartDate = moment(currentWeekStartDate).add(7, 'days')
+      let currentWeek = schedule.current_week
+      let nextWeek = 1 + (currentWeek % 2)
 
       return (
-        <div>
-          {map(lessonsPerWeek, (lessonsPerDay, week) =>
-            <div className="row">
-              {map(lessonsPerDay, (lessons, weekday) =>
-                <LessonsList weekday={weekday} lessons={lessons}/>)}
-            </div>)}
+        <div className="schedule">
+          <LessonsWeekList
+            week={currentWeek}
+            weekStartDate={currentWeekStartDate}
+            lessons={lessonsPerWeek[currentWeek]} />
+          <LessonsWeekList
+            week={nextWeek}
+            weekStartDate={nextWeekStartDate}
+            lessons={lessonsPerWeek[nextWeek]} />
         </div>
       )
     }
