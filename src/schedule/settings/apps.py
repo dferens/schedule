@@ -38,8 +38,8 @@ STATICFILES_FINDERS += ('djangobower.finders.BowerFinder',)
 BOWER_INSTALLED_APPS = (
     'bootstrap#3.3.2',
     'jquery#>1.9.1',
-    'react#0.12.2',
-    'react-router#0.12.2',
+    'react#0.13.1',
+    'react-router#0.13.2',
     'lodash#3.3.1',
     'moment#2.9.0'
 )
