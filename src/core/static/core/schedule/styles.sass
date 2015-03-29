@@ -1,54 +1,78 @@
-.lessons-list
-  width: 200px
-  float: left
-  margin: 1px
+.schedule
+  background-color: #ddd
 
-  .lesson-item
-    padding: 5px
-    margin-bottom: -1px
-    background-color: #fff
-    border: 1px solid #ddd
-    height: 6em
-
-    &:first-child
-      border-top-left-radius: 4px
-      border-top-right-radius: 4px
-
-    &:last-child
-      border-bottom-left-radius: 4px
-      border-bottom-right-radius: 4px
-
-    &.header
-      height: initial
-      background-color: rgb(238, 238, 238)
-
-    &.empty
-      background-color: rgb(238, 238, 238)
-
-    p
-      margin: 0
-
-    .title
-      height: 32px
+  .lessons-week
+    .lessons-list
+      background-color: #f5f5f5
+      border-radius: 4px
+      border: 1px solid #ddd
+      box-sizing: content-box
+      display: inline-block
+      font-size: 15px
+      margin-left: 5px
+      margin-top: 10px
       overflow: hidden
-      margin-top: 0
-      margin-bottom: 5px
+      vertical-align: top
+      width: 190px
+      white-space: normal
 
-    .group-link
-      display: inline-block
+      &.today
+        .lesson-list-header
+          background-color: #a4b4bf
 
-    .teacher-link
-      display: inline-block
+      .lesson-list-header
+        background: #3498db
+        border-bottom: 1px solid #ddd
+        color: #fff
+        cursor: pointer
+        font-size: 18px
+        height: 45px
+        line-height: 43px
+        overflow: hidden
+        position: relative
+        width: auto
+        z-index: 2
 
-    .course-link
-      display: inline-block
-      font-weight: bold
-      width: 100%
-      text-align: center
+        .label
+          height: 100%
+          padding-left: 10px
 
-  &.today
-    .lesson-item
-      background-color: #553E3E
+      .lesson-list-body
+        position: relative
 
-      p, a
-        color: #eeeeee
+        .lesson-item
+          background-color: #f5f5f5
+          border: none
+          height: auto
+          position: relative
+          margin-left: 5px
+          margin-right: 5px
+          margin-bottom: 5px
+
+          &:first-child
+            margin-top: 5px
+
+          &.empty .lesson-item-content
+            border: none
+            background: none
+            box-shadow: none
+
+          .lesson-item-content
+            background-color: #fff
+            border-radius: 2px
+            border: 1px solid #e2e2e2
+            box-shadow: #ddd 2px 2px 3px
+            box-sizing: border-box
+            padding: 3px 7px
+            height: 80px
+            border-left: 3px solid #27ae60
+
+            .course-link
+              font-size: 15px
+              text-align: center
+              text-overflow: ellipsis
+              overflow: hidden
+              white-space: nowrap
+
+            .teacher-link
+              font-size: 13px

@@ -7,19 +7,13 @@ schedule.ui = (function() {
 
   let {core} = schedule
 
-  function setDefaults(object, keys, value=null) {
-    keys.filter(k => !has(object, k))
-        .forEach(k => {object[k] = value})
-    return object
-  }
-
   let CourseButton = React.createClass({
     render() {
       let {id, short_name} = this.props.course
       return (
-        <Link className="course-link" to="course-schedule" params={{courseId: id}}>
-          {short_name}
-        </Link>
+        <div className="course-link">
+          <Link to="course-schedule" params={{courseId: id}}>{short_name}</Link>
+        </div>
       )
     }
   })
@@ -28,9 +22,7 @@ schedule.ui = (function() {
     render() {
       let {id, short_name} = this.props.teacher
       return (
-        <Link className="teacher-link" to="teacher-schedule" params={{teacherId: id}}>
-          {short_name}
-        </Link>
+        <Link to="teacher-schedule" params={{teacherId: id}}>{short_name}</Link>
       )
     }
   })
@@ -76,13 +68,21 @@ schedule.ui = (function() {
 
         return (
           <div className="lesson-item">
-            <CourseButton course={lesson.course} />
-            {teacherButton}
-            <p className="groups">{groupButtons}</p>
+            <div className="lesson-item-content">
+              <CourseButton course={lesson.course} />
+              <div className="teacher-link">
+                {teacherButton}
+              </div>
+              <p className="groups">{groupButtons}</p>
+            </div>
           </div>
         )
       } else {
-        return <div className="lesson-item empty"/>
+        return (
+          <div className="lesson-item empty">
+            <div className="lesson-item-content"/>
+          </div>
+        )
       }
     }
   })
@@ -99,15 +99,17 @@ schedule.ui = (function() {
     render() {
       let {lessons, lessonsDate} = this.props
       let isToday = moment().startOf('day').isSame(lessonsDate.startOf('day'))
-      let lessonPerNum = indexBy(lessons, "number")
-      setDefaults(lessonPerNum, core.getLessonNumbersRange())
 
       return (
         <div className={'lessons-list ' + (isToday ? 'today' : '')}>
-          <div className="lesson-item header">
-            <p>{lessonsDate.format(this.headerMomentFormat)}</p>
+          <div className="lesson-list-header">
+            <div className="label">
+              {lessonsDate.format(this.headerMomentFormat)}
+            </div>
           </div>
-          {map(lessonPerNum, lesson => <LessonItem lesson={lesson}/>)}
+          <div className="lesson-list-body">
+            {map(lessons, lesson => <LessonItem lesson={lesson}/>)}
+          </div>
         </div>
       )
     }
@@ -125,10 +127,18 @@ schedule.ui = (function() {
       let {week, weekStartDate, lessons} = this.props
       let className = (week == 1) ? 'primary' : 'secondary'
       let lessonsPerDay = groupBy(lessons, 'weekday')
-      setDefaults(lessonsPerDay, core.getWeekdaysRange())
+      map(lessonsPerDay, (lessons, day) => {
+        let minNumber = _.min(lessons, 'number').number
+        for (let i in range(1, minNumber))
+          lessons.unshift(null)
+      })
+      map(core.getWeekdaysRange(), day => {
+        if (!has(lessonsPerDay, day))
+          lessonsPerDay[day] = []
+      })
 
       return (
-        <div className={'row ' + className}>
+        <div className={'lessons-week ' + className}>
           {map(lessonsPerDay, (lessons, weekday) => {
             let date = moment(weekStartDate).add(weekday - 1, 'days')
             return (
@@ -252,7 +262,11 @@ schedule.ui = (function() {
     run(element) {
       let App = React.createClass({
         render() {
-          return <div><RouteHandler params={this.props.params}/></div>
+          return (
+            <div className="schedule-app">
+              <RouteHandler params={this.props.params}/>
+            </div>
+          )
         }
       })
 
