@@ -39,16 +39,15 @@ schedule.core = {
         return _.range(1, 6)
     },
 
-    getWeekdayName(weekday) {
-        let weekday = typeof weekday == 'string' ? parseInt(weekday) : weekday
-        switch (weekday) {
-            case 1: return "mn"
-            case 2: return "tu"
-            case 3: return "we"
-            case 4: return "th"
-            case 5: return "fr"
-            case 6: return "sa"
-            case 7: return "su"
-        }
+    getLessonRange(date, lessonNumber) {
+        if (lessonNumber < 1 || lessonNumber > 5)
+            throw 'Invalid lesson number'
+
+        let start = moment(date).hours(8).minutes(30).seconds(0)
+        start.add(115 * (lessonNumber - 1), 'minutes')
+        return [
+            start,
+            moment(start).add(95, 'minutes')
+        ]
     }
 }

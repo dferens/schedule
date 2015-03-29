@@ -1,4 +1,8 @@
-from . import rozkladorg, import_service
+from datetime import timedelta
+
+from django.utils import timezone
+
+from . import models, rozkladorg, import_service
 from .models import Course, Group, GroupIndex, Lesson, Teacher
 
 
@@ -43,3 +47,15 @@ def get_teacher_lessons(teacher: Teacher) -> [Lesson]:
 
 def get_course_lessons(course: Course) -> [Lesson]:
     return Lesson.objects.of_course(course)
+
+
+def get_week_number() -> int:
+    """
+    Returns current week number, either 1 or 2.
+    """
+    settings = models.SiteSettings.objects.get()
+    monday_date = settings.first_week_monday
+    today = timezone.now().date()
+    current_week_monday = today - timedelta(days=today.weekday())
+    is_primary = ((current_week_monday - monday_date).days % 14) == 0
+    return 1 if is_primary else 2

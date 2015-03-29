@@ -60,3 +60,8 @@ class LessonAdmin(ModelAdmin):
         return '<a href="%s">%s</a>' % (url, lesson.teacher)
     teacher_link.allow_tags = True
     teacher_link.short_description = models.Teacher._meta.verbose_name
+
+
+@register(models.SiteSettings)
+class SiteSettingsAdmin(ModelAdmin):
+    pass

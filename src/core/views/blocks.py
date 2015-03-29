@@ -1,3 +1,6 @@
+from .. import service
+
+
 def is_block(obj):
     return hasattr(obj, 'get_context')
 
@@ -59,6 +62,7 @@ class LessonBlock(object):
 
     def get_context(self):
         return {
+            'id': self.lesson.id,
             'course': CourseBlock(self.lesson.course),
             'week': self.lesson.week,
             'weekday': self.lesson.weekday,
@@ -66,7 +70,7 @@ class LessonBlock(object):
             'place': self.lesson.place,
             'type': self.lesson.type,
             'teacher': TeacherBlock(self.lesson.teacher) if self.lesson.teacher else None,
-            'groups': [GroupBlock(g) for g in self.lesson.groups.all()]
+            'groups': [GroupBlock(g) for g in self.lesson.groups.all()],
         }
 
 
@@ -77,6 +81,6 @@ class ScheduleBlock(object):
 
     def get_context(self):
         return {
-            'current_week': 1,
+            'current_week': service.get_week_number(),
             'lessons': [LessonBlock(l) for l in self.lessons]
         }
