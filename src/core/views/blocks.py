@@ -10,7 +10,7 @@ def expand(obj):
         return {k: expand(v) for k, v in obj.items()}
     elif isinstance(obj, list):
         return list(map(expand, obj))
-    elif isinstance(obj, tuple):
+    elif isinstance(obj, (map, tuple)):
         return tuple(map(expand, obj))
     elif is_block(obj):
         return expand(obj.get_context())

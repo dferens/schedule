@@ -1,6 +1,7 @@
 from datetime import timedelta
 
 from django.utils import timezone
+from django.db.models.query import Q
 
 from . import models, rozkladorg, import_service
 from .models import Course, Group, GroupIndex, Lesson, Teacher
@@ -59,3 +60,17 @@ def get_week_number() -> int:
     current_week_monday = today - timedelta(days=today.weekday())
     is_primary = ((current_week_monday - monday_date).days % 14) == 0
     return 1 if is_primary else 2
+
+
+def search_objects(query: str):
+    return {
+        'groups': Group.objects.filter(
+            Q(code__icontains=query) |
+            Q(groupindex__alias__icontains=query)
+        ).distinct(),
+        'teachers': Teacher.objects.filter(full_name__icontains=query),
+        'courses': Course.objects.filter(
+            Q(full_name__icontains=query) |
+            Q(short_name__icontains=query)
+        )
+    }

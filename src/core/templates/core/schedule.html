@@ -7,6 +7,7 @@
   {% javascript 'react' %}
   {% javascript 'schedule' %}
   <script>
+    schedule.settings.search_url = "{% url 'schedule:search' %}";
     schedule.settings.group_lessons_url = "{% url 'schedule:group-lessons' %}";
     schedule.settings.course_lessons_url = "{% url 'schedule:course-lessons' %}";
     schedule.settings.teacher_lessons_url = "{% url 'schedule:teacher-lessons' %}";

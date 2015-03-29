@@ -20,6 +20,14 @@ LESSON_TYPES = (
 )
 
 
+class ApiError(Exception):
+    """
+    Any unexpected rozkladorg error - timeout, 500 etc.
+    """
+    def __init__(self, caused):
+        self.caused = caused
+
+
 def get_group(group_code: str) -> dict:
     """
     Get info about given group.
@@ -32,9 +40,16 @@ def get_group(group_code: str) -> dict:
             'group_okr': str (bachelor | magister | specialist)
             'group_type': str (daily | extramural)
         }
+
+    Raises:
+        ApiError
     """
     url = urljoin(API_URL, 'groups/%s' % group_code)
-    resp = requests.get(url).json()
+
+    try:
+        resp = requests.get(url).json()
+    except requests.ConnectionError as e:
+        raise ApiError(e)
 
     if resp['statusCode'] == 200:
         data = resp['data']
@@ -78,9 +93,16 @@ def get_group_lessons(group_code: str) -> dict:
             }
         }
 
+    Raises:
+        ApiError
+
     """
     url = urljoin(API_URL, 'groups/%s/lessons' % group_code)
-    resp = requests.get(url).json()
+
+    try:
+        resp = requests.get(url).json()
+    except requests.ConnectionError as e:
+        raise ApiError(e)
 
     def clean_lesson_number(num):
         assert num in map(str, range(1, 6))

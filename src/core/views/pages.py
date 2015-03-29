@@ -13,6 +13,26 @@ class ScheduleAppView(TemplateView):
     template_name = 'core/schedule.html'
 
 
+class SearchView(View):
+
+    def get(self, request):
+        query = request.REQUEST.get('query') or ''
+
+        if len(query) > 1:
+            results = service.search_objects(query)
+        else:
+            results = {'teachers': (), 'groups': (), 'courses': ()}
+
+        data = {
+            'results': {
+                'groups': map(blocks.GroupBlock, results['groups']),
+                'teachers': map(blocks.TeacherBlock, results['teachers']),
+                'courses': map(blocks.CourseBlock, results['courses'])
+            }
+        }
+        return JsonResponse(expand(data))
+
+
 class BaseLessonsView(View):
 
     def get(self, request):

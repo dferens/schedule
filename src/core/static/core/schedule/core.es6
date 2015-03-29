@@ -31,6 +31,13 @@ schedule.core = {
         })
     },
 
+    searchItems(query, callback) {
+        let url = schedule.settings.search_url
+        $.get(url, {query: query}, data => {
+            callback({results: data.results})
+        })
+    },
+
     getWeekdaysRange() {
         return _.range(1, 7)
     },

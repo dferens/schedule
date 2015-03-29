@@ -234,8 +234,16 @@ schedule.ui = (function() {
       if (this.state) {
         return (
           <div>
-            <p>Schedule for group: {this.props.params.code}</p>
-            <Schedule schedule={this.state.schedule} />
+            <div className="row">
+              <div className="col-md-12">
+                <p className="lead">Schedule for group: {this.props.params.code}</p>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-12">
+                <Schedule schedule={this.state.schedule} />
+              </div>
+            </div>
           </div>
         )
       } else {
@@ -259,8 +267,16 @@ schedule.ui = (function() {
       if (this.state) {
         return (
           <div>
-            <p>Schedule for teacher: {this.state.teacher.full_name}</p>
-            <Schedule schedule={this.state.schedule} />
+            <div className="row">
+              <div className="col-md-12">
+                <p className="lead">Schedule for: {this.state.teacher.full_name}</p>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-12">
+                <Schedule schedule={this.state.schedule} />
+              </div>
+            </div>
           </div>
         )
       } else {
@@ -284,8 +300,16 @@ schedule.ui = (function() {
       if (this.state) {
         return (
           <div>
-            <p>Schedule for course: {this.state.course.full_name}</p>
-            <Schedule schedule={this.state.schedule} />
+            <div className="row">
+              <div className="col-md-12">
+                <p className="lead">Schedule for course: {this.state.course.full_name}</p>
+              </div>
+            </div>
+            <div className="row">
+              <div className="col-md-12">
+                <Schedule schedule={this.state.schedule} />
+              </div>
+            </div>
           </div>
         )
       } else {
@@ -294,15 +318,112 @@ schedule.ui = (function() {
     }
   })
 
+  let StartHandlerResults = React.createClass({
+    contextTypes: {
+      router: React.PropTypes.func.isRequired
+    },
+
+    getInitialState() {
+      return {teachers: [], courses: [], groups: []}
+    },
+
+    componentWillReceiveProps(newProps) {
+      core.searchItems(newProps.query, data => {
+        let {teachers, groups, courses} = data.results
+        this.setState({
+          teachers: sortBy(teachers, 'full_name'),
+          groups: sortBy(groups, 'code'),
+          courses: sortBy(courses, 'full_name')
+        })
+      })
+    },
+
+    renderObjectLink(object, type=null) {
+      let linkNode = null;
+
+      if (type == 'group') {
+        linkNode = (
+          <Link to="group-schedule" params={{code: object.code}}>
+            <span className="glyphicon glyphicon-pencil" aria-hidden="true">
+            </span> {object.code.toUpperCase()}
+          </Link>
+        )
+      } else if (type == 'teacher') {
+        linkNode = (
+          <Link to="teacher-schedule" params={{teacherId: object.id}}>
+            <span className="glyphicon glyphicon-user" aria-hidden="true">
+            </span> {object.full_name}
+          </Link>
+        )
+      } else {
+        linkNode = (
+          <Link to="course-schedule" params={{courseId: object.id}}>
+            <span className="glyphicon glyphicon-book" aria-hidden="true">
+            </span> [{object.short_name}] {object.full_name}
+          </Link>
+        )
+      }
+      return (
+        <div className="list-group-item">
+          {linkNode}
+        </div>
+      )
+    },
+
+    render() {
+      let {teachers, groups, courses} = this.state
+
+      return (
+        <div className="search-results">
+          <div className="list-group">
+            {map(teachers, t => this.renderObjectLink(t, 'teacher'))}
+            {map(groups, g => this.renderObjectLink(g, 'group'))}
+            {map(courses, c => this.renderObjectLink(c, 'course'))}
+          </div>
+        </div>
+      )
+    }
+  })
+
+  let StartHandler = React.createClass({
+    getInitialState() {
+      return {value: ''}
+    },
+
+    handleChange(event) {
+      this.setState({value: event.target.value})
+    },
+
+    render() {
+      return (
+        <div className="start-page">
+          <div className="row">
+            <div className="col-md-12">
+              <div className="input-group input-group-lg">
+                <input
+                  type="text" className="form-control"
+                  value={this.state.value}
+                  onChange={this.handleChange}
+                  placeholder="Type group, teacher or course name"/>
+                <span className="input-group-addon">@</span>
+              </div>
+            </div>
+          </div>
+          <div className="row">
+            <div className="col-md-12">
+              <StartHandlerResults query={this.state.value}/>
+            </div>
+          </div>
+        </div>
+      )
+    }
+  })
+
   return {
     run(element) {
       let App = React.createClass({
         render() {
-          return (
-            <div className="schedule-app">
-              <RouteHandler params={this.props.params}/>
-            </div>
-          )
+          return <RouteHandler params={this.props.params}/>
         }
       })
 
@@ -311,6 +432,7 @@ schedule.ui = (function() {
           <Route name="group-schedule" path="group/:code/" handler={GroupScheduleHandler} />
           <Route name="teacher-schedule" path="teacher/:teacherId/" handler={TeacherScheduleHandler} />
           <Route name="course-schedule" path="course/:courseId/" handler={CourseScheduleHandler} />
+          <DefaultRoute handler={StartHandler} />
         </Route>
       )
       Router.run(routes, Router.HistoryLocation, (Handler, state) => {
