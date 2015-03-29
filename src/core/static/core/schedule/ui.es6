@@ -67,9 +67,14 @@ schedule.ui = (function() {
         if (lesson.teacher)
           teacherButton = <TeacherButton teacher={lesson.teacher} />
 
+        let placeBadge = null
+        if (lesson.place)
+          placeBadge = <div className="place-badge">{lesson.place}</div>
+
         return (
           <div className={'lesson-item' + (highlight ? ' highlight':'')}>
             <div className="lesson-item-content">
+              {placeBadge}
               <CourseButton course={lesson.course} />
               <div className="teacher-link">
                 {teacherButton}
