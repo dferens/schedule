@@ -20,10 +20,15 @@ schedule.ui = (function() {
 
   let TeacherButton = React.createClass({
     render() {
-      let {id, short_name} = this.props.teacher
-      return (
-        <Link to="teacher-schedule" params={{teacherId: id}}>{short_name}</Link>
-      )
+
+      if (this.props.teacher == null)
+        return <a />
+      else {
+        let {id, short_name} = this.props.teacher
+        return (
+          <Link to="teacher-schedule" params={{teacherId: id}}>{short_name}</Link>
+        )
+      }
     }
   })
 
@@ -63,23 +68,26 @@ schedule.ui = (function() {
           return result
         }, [])
 
-        let teacherButton = null
-        if (lesson.teacher)
-          teacherButton = <TeacherButton teacher={lesson.teacher} />
+        let teacherButton = <TeacherButton teacher={lesson.teacher} />
 
-        let placeBadge = null
+        let placeTag = null
         if (lesson.place)
-          placeBadge = <div className="place-badge">{lesson.place}</div>
+          placeTag = <div className="tag">{lesson.place}</div>
+
+        let typeTag = null
+        if (lesson.type)
+          typeTag = <div className="tag">{core.getLessonTypeName(lesson.type)}</div>
 
         return (
           <div className={'lesson-item' + (highlight ? ' highlight':'')}>
             <div className="lesson-item-content">
-              {placeBadge}
+              {placeTag}
               <CourseButton course={lesson.course} />
+              {typeTag}
               <div className="teacher-link">
                 {teacherButton}
               </div>
-              <p className="groups">{groupButtons}</p>
+              <p className="group-links">{groupButtons}</p>
             </div>
           </div>
         )
@@ -237,12 +245,7 @@ schedule.ui = (function() {
     },
 
     formatLesson({course, teacher, place, type, groups}) {
-      let lessonType = {
-        lecture: 'Лек',
-        practice: 'Прак',
-        lab: 'Лаб',
-        null: ''
-      }[type]
+      let lessonType = core.getLessonTypeName(type) || ''
       let teacherName = (this.props.printTeacher && teacher) ? teacher.short_name : ''
       let groupCodes = _(groups).map(g => g.code.toUpperCase()).sortBy().value()
       let groupsNode = null

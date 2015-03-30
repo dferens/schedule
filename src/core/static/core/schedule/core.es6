@@ -42,8 +42,12 @@ schedule.core = {
         return _.range(1, 7)
     },
 
-    getLessonNumbersRange() {
-        return _.range(1, 6)
+    getLessonTypeName(lessonType) {
+        return {
+            lecture: 'Лек',
+            practice: 'Прак',
+            lab: 'Лаб',
+        }[lessonType]
     },
 
     getLessonRange(date, lessonNumber) {

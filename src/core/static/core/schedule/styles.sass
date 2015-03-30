@@ -86,30 +86,36 @@
             border-left: 3px solid #27ae60
 
             .course-link
-              font-size: 14px
+              font-size: 13px
               text-align: center
               text-overflow: ellipsis
               overflow: hidden
               white-space: nowrap
 
             .teacher-link
-              font-size: 13px
-              border-bottom: 1px solid #e2e2e2
+              font-size: 12px
               padding: 2px
-              text-overflow: ellipsis
+              text-overflow: clip
               overflow: hidden
               white-space: nowrap
 
-            .group-link
-              font-size: 13px
+              a
+                display: inline-block
 
-            .place-badge
+            .group-links
+              border-top: 1px solid #e2e2e2
+
+              .group-link
+                font-size: 13px
+
+            .tag
               background: rgba(0,0,0,.08)
               border-radius: 2px
               color: #666
               float: right
               font-size: 13px
               padding: 0 2px
+              margin-left: 2px
 
     // Black magic, ask printer use colors by default
   -webkit-print-color-adjust: exact
