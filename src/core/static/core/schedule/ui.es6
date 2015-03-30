@@ -215,6 +215,116 @@ schedule.ui = (function() {
     }
   })
 
+  let PrintSchedule = React.createClass({
+    /*
+     * Constructs printable schedule
+     *
+     * @prop {ScheduleBlock} schedule
+     * @prop {String} title
+     */
+
+    formatTime(startTime, endTime) {
+      return `${startTime.format('H:mm')} - ${endTime.format('H:mm')}`
+    },
+
+    formatLesson({course, teacher, place, type}) {
+      let lessonType = {
+        lecture: 'Лек',
+        practice: 'Прак',
+        lab: 'Лаб',
+        null: ''
+      }[type]
+      let teacherName = teacher? teacher.short_name : ''
+      return `${course.short_name}, ${teacherName} ${place || ''} ${lessonType}`
+    },
+
+    lessonsEqual(l1, l2) {
+      return (
+        _.isEqual(l1.course, l2.course) &&
+        _.isEqual(l1.teacher, l2.teacher) &&
+        (l1.number == l2.number) &&
+        (l1.place == l2.place) &&
+        (l1.type == l2.type) &&
+        (l1.weekday == l2.weekday)
+      )
+    },
+
+    render() {
+      let {schedule, title} = this.props
+      let lessonsByWeekday = groupBy(schedule.lessons, 'weekday')
+
+      let renderLessonCell = (content, colSpan=1) => {
+        return <td className="lesson-cell" colSpan={colSpan}>{content}</td>
+      }
+
+      let addWeekdayRow = (nodes, dayLessons, weekday) => {
+        let dayLessons = sortBy(dayLessons, 'number')
+        let weekdayName = moment().weekday(weekday - 1).format('dddd')
+        let lessonsPerNumber = groupBy(dayLessons, 'number')
+        let numbersCount = _.keys(lessonsPerNumber).length
+
+        each(lessonsPerNumber, (lessons, number) => {
+          let [lessonStart, lessonEnd] = core.getLessonRange(moment(), number)
+
+          if (lessons.length == 2) {
+            if (this.lessonsEqual(lessons[0], lessons[1])) {
+              var lessonCells = [renderLessonCell(this.formatLesson(lessons[0]), 2)]
+            } else {
+              var lessonCells = map(lessons, l => renderLessonCell(this.formatLesson(l)))
+            }
+          } else {
+            let emptyCell = renderLessonCell('')
+            let lessonCell = renderLessonCell(this.formatLesson(lessons[0]))
+            var lessonCells = (lessons[0].week == 1) ?
+                                [lessonCell, emptyCell] :
+                                [emptyCell, lessonCell]
+          }
+
+          let weekdayNode = null
+          if (number == dayLessons[0].number)
+            weekdayNode = (
+              <td className="weekday-cell"
+                  rowSpan={numbersCount}>{weekdayName}</td>
+            )
+
+          nodes.push(
+            <tr data-weekday={weekday}>
+              {weekdayNode}
+              <td className="number-cell">{number}</td>
+              <td className="time-cell">{this.formatTime(lessonStart, lessonEnd)}</td>
+              {lessonCells}
+            </tr>
+          )
+        })
+        return nodes
+      }
+
+      let rowsNodes = reduce(lessonsByWeekday, addWeekdayRow, [])
+
+      return (
+        <div className="printable-schedule">
+          <table className="schedule">
+            <tbody>
+              <!-- Header starts-->
+              <tr>
+                <th rowSpan="2"></th>
+                <th rowSpan="2">№</th>
+                <th rowSpan="2">час</th>
+                <th colSpan="2">{title}</th>
+              </tr>
+              <tr>
+                <td>I тиждень</td>
+                <td>II тиждень</td>
+              </tr>
+              <!-- Header ends -->
+              {rowsNodes}
+            </tbody>
+          </table>
+        </div>
+      )
+    }
+  })
+
   let GroupScheduleHandler = React.createClass({
     componentWillMount() {
       this.loadSchedule(this.props.params.code)
@@ -224,19 +334,25 @@ schedule.ui = (function() {
     },
 
     loadSchedule(groupCode) {
-      core.getGroupSchedule(
-        groupCode,
-        ({group, schedule}) => this.setState({group: group, schedule: schedule})
-      )
+      core.getGroupSchedule(groupCode, ({group, schedule}) => {
+        this.setState({group: group, schedule: schedule})
+      })
     },
 
     render() {
-      if (this.state) {
-        return (
-          <div>
+      if (this.state == null)
+        return null
+
+      return (
+        <div>
+          <div className="hidden-print">
             <div className="row">
-              <div className="col-md-12">
+              <div className="col-md-10">
                 <p className="lead">Schedule for group: {this.props.params.code}</p>
+              </div>
+              <div className="col-md-2">
+                <button className="btn btn-primary btn-lg pull-right"
+                  onClick={print}>Print</button>
               </div>
             </div>
             <div className="row">
@@ -245,10 +361,13 @@ schedule.ui = (function() {
               </div>
             </div>
           </div>
-        )
-      } else {
-        return null
-      }
+          <div className="visible-print-block">
+            <PrintSchedule
+              schedule={this.state.schedule}
+              title={`Група ${this.state.group.code.toUpperCase()}`} />
+          </div>
+        </div>
+      )
     }
   })
 
@@ -264,24 +383,23 @@ schedule.ui = (function() {
     },
 
     render() {
-      if (this.state) {
-        return (
-          <div>
-            <div className="row">
-              <div className="col-md-12">
-                <p className="lead">Schedule for: {this.state.teacher.full_name}</p>
-              </div>
-            </div>
-            <div className="row">
-              <div className="col-md-12">
-                <Schedule schedule={this.state.schedule} />
-              </div>
+      if (this.state == null)
+        return null
+
+      return (
+        <div>
+          <div className="row">
+            <div className="col-md-12">
+              <p className="lead">Schedule for: {this.state.teacher.full_name}</p>
             </div>
           </div>
-        )
-      } else {
-        return null
-      }
+          <div className="row">
+            <div className="col-md-12">
+              <Schedule schedule={this.state.schedule} />
+            </div>
+          </div>
+        </div>
+      )
     }
   })
 

@@ -28,8 +28,11 @@
       margin-bottom: 10px
       overflow: hidden
       vertical-align: top
-      width: 180px
+      width: 16.12%
       white-space: normal
+
+      &:last-child
+        margin-right: 0
 
       .lesson-list-header
         background: #3498db
@@ -107,3 +110,45 @@
               float: right
               font-size: 13px
               padding: 0 2px
+
+    // Black magic, ask printer use colors by default
+  -webkit-print-color-adjust: exact
+
+  .printable-schedule
+    table.schedule
+      border-style: double
+
+      tr
+        &[data-weekday="1"] .lesson-cell
+          background-color: rgb(242, 222, 222)!important
+
+        &[data-weekday="2"] .lesson-cell
+          background-color: rgb(252, 248, 227)!important
+
+        &[data-weekday="3"] .lesson-cell
+          background-color: rgb(217, 237, 247)!important
+
+        &[data-weekday="4"] .lesson-cell
+          background-color: rgb(223, 240, 216)!important
+
+        &[data-weekday="5"] .lesson-cell
+          background-color: #ACD5F8 !important
+
+        &[data-weekday="6"] .lesson-cell
+          background-color: #E6D3F5 !important
+
+        td, th
+          text-align: center
+          border: 1px solid black
+          padding: 3px
+
+        .weekday-cell
+          transform: rotate(-90deg)
+          transform-origin: 50% 50%
+
+        .number-cell
+          font-weight: 500
+
+        .time-cell
+          width: 100px
+          background-color: #E0DEDE !important
