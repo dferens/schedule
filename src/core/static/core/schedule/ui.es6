@@ -222,11 +222,13 @@ schedule.ui = (function() {
      * @prop {ScheduleBlock} schedule
      * @prop {String} title
      * @prop {bool} printTeacher [true]
+     * @prop {bool} printGroups [true]
      */
 
     getDefaultProps() {
       return {
-        printTeacher: true
+        printTeacher: true,
+        printGroups: true
       }
     },
 
@@ -234,7 +236,7 @@ schedule.ui = (function() {
       return `${startTime.format('H:mm')} - ${endTime.format('H:mm')}`
     },
 
-    formatLesson({course, teacher, place, type}) {
+    formatLesson({course, teacher, place, type, groups}) {
       let lessonType = {
         lecture: 'Лек',
         practice: 'Прак',
@@ -242,7 +244,18 @@ schedule.ui = (function() {
         null: ''
       }[type]
       let teacherName = (this.props.printTeacher && teacher) ? teacher.short_name : ''
-      return `${course.short_name}, ${teacherName} ${place || ''} ${lessonType}`
+      let groupCodes = _(groups).map(g => g.code.toUpperCase()).sortBy().value()
+      let groupsNode = null
+
+      if (this.props.printGroups && groups.length > 0) {
+          let groupsSummary = reduce(groupCodes, (result, g) => `${result}, ${g}`)
+          groupsNode = <p>{groupsSummary}</p>
+      }
+
+      return [
+        <p>{`${course.short_name}, ${teacherName} ${place || ''} ${lessonType}`}</p>,
+        {groupsNode}
+      ]
     },
 
     lessonsEqual(l1, l2) {
@@ -371,6 +384,7 @@ schedule.ui = (function() {
           <div className="visible-print-block">
             <PrintSchedule
               schedule={this.state.schedule}
+              printGroups={false}
               title={`Група ${this.state.group.code.toUpperCase()}`} />
           </div>
         </div>
