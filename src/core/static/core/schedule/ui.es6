@@ -221,7 +221,14 @@ schedule.ui = (function() {
      *
      * @prop {ScheduleBlock} schedule
      * @prop {String} title
+     * @prop {bool} printTeacher [true]
      */
+
+    getDefaultProps() {
+      return {
+        printTeacher: true
+      }
+    },
 
     formatTime(startTime, endTime) {
       return `${startTime.format('H:mm')} - ${endTime.format('H:mm')}`
@@ -234,7 +241,7 @@ schedule.ui = (function() {
         lab: 'Лаб',
         null: ''
       }[type]
-      let teacherName = teacher? teacher.short_name : ''
+      let teacherName = (this.props.printTeacher && teacher) ? teacher.short_name : ''
       return `${course.short_name}, ${teacherName} ${place || ''} ${lessonType}`
     },
 
@@ -388,15 +395,27 @@ schedule.ui = (function() {
 
       return (
         <div>
-          <div className="row">
-            <div className="col-md-12">
-              <p className="lead">Schedule for: {this.state.teacher.full_name}</p>
+          <div className="hidden-print">
+            <div className="row">
+              <div className="col-md-10">
+                <p className="lead">Schedule for: {this.state.teacher.full_name}</p>
+              </div>
+              <div className="col-md-2">
+                  <button className="btn btn-primary btn-lg pull-right"
+                    onClick={print}>Print</button>
+                </div>
+            </div>
+            <div className="row">
+              <div className="col-md-12">
+                <Schedule schedule={this.state.schedule} />
+              </div>
             </div>
           </div>
-          <div className="row">
-            <div className="col-md-12">
-              <Schedule schedule={this.state.schedule} />
-            </div>
+          <div className="visible-print-block">
+            <PrintSchedule
+              schedule={this.state.schedule}
+              title={this.state.teacher.full_name}
+              printTeacher={false}/>
           </div>
         </div>
       )
