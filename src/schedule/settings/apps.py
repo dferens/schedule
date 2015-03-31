@@ -40,7 +40,7 @@ BOWER_INSTALLED_APPS = (
     'jquery#>1.9.1',
     'react#0.13.1',
     'react-router#0.13.2',
-    'lodash#3.3.1',
+    'lodash#3.6.0',
     'moment#2.9.0'
 )
 
