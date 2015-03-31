@@ -207,11 +207,13 @@ schedule.ui = (function() {
 
       let nextWeekStartDate = moment(currentWeekStartDate).add(7, 'days')
       let nextWeek = 1 + (currentWeek % 2)
+      let weekSortAscending = (currentWeek == 1) ? true : false
       let highlightLessonId = (
         _.chain(schedule.lessons)
-         .sortByAll(['weekday', 'number'])
+         .sortByOrder(['week', 'weekday', 'number'], [weekSortAscending, true, true])
          .filter(l => {
-            let lessonDate = moment(currentWeekStartDate).add(l.weekday - 1, 'days')
+            let startDate = (l.week == currentWeek) ? currentWeekStartDate : nextWeekStartDate
+            let lessonDate = moment(startDate).add(l.weekday - 1, 'days')
             let [, lessonEnd] = core.getLessonRange(lessonDate, l.number)
             return moment().isBefore(lessonEnd)
          })
@@ -225,11 +227,12 @@ schedule.ui = (function() {
             week={currentWeek}
             weekStartDate={currentWeekStartDate}
             lessons={lessonsPerWeek[currentWeek]}
-            highlightLesson={highlightLessonId}/>
+            highlightLesson={highlightLessonId} />
           <LessonsWeekList
             week={nextWeek}
             weekStartDate={nextWeekStartDate}
-            lessons={lessonsPerWeek[nextWeek]} />
+            lessons={lessonsPerWeek[nextWeek]}
+            highlightLesson={highlightLessonId} />
         </div>
       )
     }
