@@ -7,12 +7,23 @@ schedule.ui = (function() {
 
   let {core} = schedule
 
+  let getObjectRouteParams = (object, objectType) => {
+    if (objectType == 'group')
+      return ['group-schedule', {code: object.code}]
+    else if (objectType == 'teacher')
+      return ['teacher-schedule', {teacherId: object.id}]
+    else if (objectType == 'course')
+      return ['course-schedule', {courseId: object.id}]
+    else
+      throw 'Invalid object type'
+  }
+
   let CourseButton = React.createClass({
     render() {
-      let {id, short_name} = this.props.course
+      let [to, params] = getObjectRouteParams(this.props.course, 'course')
       return (
         <div className="course-link">
-          <Link to="course-schedule" params={{courseId: id}}>{short_name}</Link>
+          <Link to={to} params={params}>{this.props.course.short_name}</Link>
         </div>
       )
     }
@@ -24,9 +35,9 @@ schedule.ui = (function() {
       if (this.props.teacher == null)
         return <a />
       else {
-        let {id, short_name} = this.props.teacher
+        let [to, params] = getObjectRouteParams(this.props.teacher, 'teacher')
         return (
-          <Link to="teacher-schedule" params={{teacherId: id}}>{short_name}</Link>
+          <Link to={to} params={params}>{this.props.teacher.short_name}</Link>
         )
       }
     }
@@ -40,8 +51,9 @@ schedule.ui = (function() {
      */
     render() {
       let {group} = this.props
+      let [to, params] = getObjectRouteParams(group, 'group')
       return (
-        <Link className="group-link" to="group-schedule" params={{code: group.code}}>
+        <Link className="group-link" to={to} params={params}>
           {group.code.toUpperCase()}
         </Link>
       )
@@ -196,7 +208,7 @@ schedule.ui = (function() {
       let nextWeekStartDate = moment(currentWeekStartDate).add(7, 'days')
       let nextWeek = 1 + (currentWeek % 2)
       let highlightLessonId = (
-        _.chain(lessonsPerWeek[currentWeek])
+        _.chain(schedule.lessons)
          .sortByAll(['weekday', 'number'])
          .filter(l => {
             let lessonDate = moment(currentWeekStartDate).add(l.weekday - 1, 'days')
@@ -472,67 +484,83 @@ schedule.ui = (function() {
     }
   })
 
-  let StartHandlerResults = React.createClass({
+  let SearchPageResults = React.createClass({
     contextTypes: {
       router: React.PropTypes.func.isRequired
     },
 
     getInitialState() {
-      return {teachers: [], courses: [], groups: []}
+      return {objectLinks: []}
+    },
+
+    getDefaultProps() {
+      return {autoTransition: false}
+    },
+
+    finishLoading({teachers, groups, courses}) {
+      let newObjectLinks = []
+
+      each(sortBy(teachers, 'full_name'), teacher => {
+        newObjectLinks.push({type: 'teacher', object: teacher})
+      })
+
+      each(sortBy(groups, 'code'), group  => {
+        newObjectLinks.push({type: 'group', object: group})
+      })
+
+      each(sortBy(courses, 'full_name'), course => {
+        newObjectLinks.push({type: 'course', object: course})
+      })
+
+      this.setState({objectLinks: newObjectLinks})
     },
 
     componentWillReceiveProps(newProps) {
-      core.searchItems(newProps.query, data => {
-        let {teachers, groups, courses} = data.results
-        this.setState({
-          teachers: sortBy(teachers, 'full_name'),
-          groups: sortBy(groups, 'code'),
-          courses: sortBy(courses, 'full_name')
-        })
-      })
+      core.searchItems(newProps.query, data => this.finishLoading(data.results))
     },
 
-    renderObjectLink(object, type=null) {
-      let linkNode = null;
+    renderObjectLink({object, type}, highlight=false) {
+      let [to, params] = getObjectRouteParams(object, type)
 
       if (type == 'group') {
-        linkNode = (
-          <Link to="group-schedule" params={{code: object.code}}>
-            <span className="glyphicon glyphicon-pencil" aria-hidden="true">
-            </span> {object.code.toUpperCase()}
-          </Link>
-        )
+        var title = object.code.toUpperCase()
+        var icon = 'glyphicon-pencil'
       } else if (type == 'teacher') {
-        linkNode = (
-          <Link to="teacher-schedule" params={{teacherId: object.id}}>
-            <span className="glyphicon glyphicon-user" aria-hidden="true">
-            </span> {object.full_name}
-          </Link>
-        )
+        var title = object.full_name
+        var icon = 'glyphicon-user'
       } else {
-        linkNode = (
-          <Link to="course-schedule" params={{courseId: object.id}}>
-            <span className="glyphicon glyphicon-book" aria-hidden="true">
-            </span> [{object.short_name}] {object.full_name}
-          </Link>
-        )
+        var title = `[${object.short_name}] ${object.full_name}`
+        var icon = 'glyphicon-book'
       }
+
+      let hintNode = highlight? <span className="keyboard-btn">Enter</span> : null
+
       return (
         <div className="list-group-item">
-          {linkNode}
+          <Link to={to} params={params}>
+            <span className={'glyphicon ' + icon} aria-hidden="true" /> {title}
+          </Link>
+          {hintNode}
         </div>
       )
     },
 
     render() {
-      let {teachers, groups, courses} = this.state
+      let {objectLinks} = this.state
+      let highlight = objectLinks.length == 1
+
+      if (objectLinks.length == 1 && this.props.autoTransition) {
+        let {object, type} = this.state.objectLinks[0]
+        let [to, params] = getObjectRouteParams(object, type)
+        let transitionFn = () => this.context.router.transitionTo(to, params)
+        setTimeout(transitionFn, 10)
+      }
 
       return (
         <div className="search-results">
           <div className="list-group">
-            {map(teachers, t => this.renderObjectLink(t, 'teacher'))}
-            {map(groups, g => this.renderObjectLink(g, 'group'))}
-            {map(courses, c => this.renderObjectLink(c, 'course'))}
+            {map(this.state.objectLinks,
+                 l => this.renderObjectLink(l, highlight))}
           </div>
         </div>
       )
@@ -544,13 +572,18 @@ schedule.ui = (function() {
       return {value: ''}
     },
 
-    handleChange(event) {
-      this.setState({value: event.target.value})
+    handleChange({target}) {
+      this.setState({value: target.value, autoTransition: false})
+    },
+
+    handleKeyPress({charCode}) {
+      if (charCode == 13)
+        this.setState({autoTransition: true})
     },
 
     render() {
       return (
-        <div className="start-page">
+        <div className="search-page">
           <div className="row">
             <div className="col-md-12">
               <div className="input-group input-group-lg">
@@ -558,6 +591,7 @@ schedule.ui = (function() {
                   type="text" className="form-control"
                   value={this.state.value}
                   onChange={this.handleChange}
+                  onKeyPress={this.handleKeyPress}
                   placeholder="Type group, teacher or course name"/>
                 <span className="input-group-addon">@</span>
               </div>
@@ -565,7 +599,9 @@ schedule.ui = (function() {
           </div>
           <div className="row">
             <div className="col-md-12">
-              <StartHandlerResults query={this.state.value}/>
+              <SearchPageResults
+                query={this.state.value}
+                autoTransition={this.state.autoTransition}/>
             </div>
           </div>
         </div>
