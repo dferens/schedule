@@ -62,7 +62,20 @@ def get_week_number() -> int:
     return 1 if is_primary else 2
 
 
-def search_objects(query: str):
+def search_objects(raw_query: str):
+    eng_to_ru = {
+        'a': 'а',
+        'e': 'е',
+        'i': 'і',
+        'k': 'к',
+        'o': 'о',
+        'p': 'р',
+        't': 'т',
+        'x': 'х',
+        'y': 'у'
+    }
+    filtered_query = raw_query.strip()
+    query = ''.join(eng_to_ru.get(char, char) for char in filtered_query)
     return {
         'groups': Group.objects.filter(
             Q(code__icontains=query) |
